@@ -14,7 +14,46 @@
 			cursor: pointer;
 		}
 	</style>
+	<script src="jquery-2.1.3.js"></script>
+	<script>
+	$(function(){
+		$("#btnAddTask").click(onBtnAddTaskClick);
+		$("#btnRemoveCompleted").click(onBtnRemoveCompletedClick)
+		$("li").click(onTaskItemClick);
+	})
+	function onBtnRemoveCompletedClick(){
+		$("#olTaskList > li.completed").remove();
+		displayMessage("Zero or more completed tasks are removed");
+	}
+	function onTaskItemClick(){
+		$(this).toggleClass("completed");
+	}
+	function onBtnAddTaskClick(){
+		var taskId = new Date().valueOf().toString();
+		$("<li></li>")
+			.attr("taskId", taskId)
+			.appendTo("#olTaskList")
+			.click(onTaskItemClick)
+			.html($("#txtTask").val());
+		displayMessage("A new task is added");
+	}
+	function displayMessage(msg){
+		$("#divMessage").html(msg);
+	}
+	/*
+	window.localStorage
+		key/value store
+		key and value should be string
 
+		- length
+		- setItem(k,v)
+		- getItem(k) => v
+		- removeItem(k)
+		- clear()
+		- key(index) => k
+
+	*/
+	</script>
 </head>
 <body>
 	<h1>Task Manager</h1>
@@ -24,9 +63,7 @@
 	<input type="button" value="Add Task" id="btnAddTask">
 	<input type="button" value="Remove Completed" id="btnRemoveCompleted">
 	<ol id="olTaskList">
-		<li>Task - 1</li>
-		<li class="completed">Task - 2</li>
-		<li>Task - 3</li>
+		
 	</ol>
 	<div id="divMessage"></div>
 </body>
