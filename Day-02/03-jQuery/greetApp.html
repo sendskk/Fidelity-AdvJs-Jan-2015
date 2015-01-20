@@ -3,26 +3,31 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Greeting App</title>
+	<style>
+	.highlight {
+		font-weight: bold;
+		font-style: italic;
+	}
+	</style>
 	<script src="jquery-2.1.3.js"></script>
+
 	<script type="text/javascript">
+	
 	function displayGreet(){
-	   var txtName = document.getElementById("txtName");
-	   var jQTxtName = jQuery(txtName);
-	   var jQDivMessage = jQuery(document.getElementById("divMessage"));
-	   var greetMsg = "Hi " + jQTxtName.val() + ", Have a nice day!";
-	   jQDivMessage.html(greetMsg);
+	   var greetMsg = "Hi <span class='highlight'>" + $("#txtName").val() + "</span>, Have a nice day!";
+	   $("#divMessage").html(greetMsg);
 	}
-	function init(){
-		var jQBtnGreet = jQuery(document.getElementById("btnGreet"));
-		jQBtnGreet.click(displayGreet);
-	}
-	jQuery(document).ready(init);
+	$(function init(){
+		$("#btnGreet").click(displayGreet);
+	});
+	//$(document).ready(init);
+	//$(init);
 	</script>
 </head>
 <body>
 	<label for="">Name :</label>
 	<input type="text" name="" id="txtName">
-	<input type="button" value="Greet" id="btnGreet">
-	<div id="divMessage"></div>
+	<input type="button" value="Greet" id="btnGreet" class="action">
+	<div id="divMessage" class="action">[Messages will be displayed here]</div>
 </body>
 </html>
