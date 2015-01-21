@@ -72,7 +72,7 @@
 	$(function(){
 		$("#btnAddTask").click(onBtnAddTaskClick);
 		$("#btnRemoveCompleted").click(onBtnRemoveCompletedClick)
-		$("li").click(onTaskItemClick);
+		$("#olTaskList").on("click","li",onTaskItemClick);
 		addTasksToList(taskStorage.getAll());
 		$("#divMessage").hide();
 	})
@@ -109,7 +109,6 @@
 		$("<li></li>")
 			.attr("taskId", task.id)
 			.prependTo("#olTaskList")
-			.click(onTaskItemClick)
 			.addClass(task.isCompleted ? "completed" : "")
 			.html(task.name)
 			.hide()
@@ -128,19 +127,7 @@
 				$(this).remove();
 			});
 	}
-	/*
-	window.localStorage
-		key/value store
-		key and value should be string
 
-		- length
-		- setItem(k,v)
-		- getItem(k) => v
-		- removeItem(k)
-		- clear()
-		- key(index) => k
-
-	*/
 	</script>
 </head>
 <body>
