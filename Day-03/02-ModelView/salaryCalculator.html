@@ -29,12 +29,19 @@
 		};
 		this.set = function(attrName, value){
 			data[attrName] = value;
-			if (typeof events[attrName] === "function")
-				events[attrName]();
+			triggerEvents(attrName);
 		}
+
 		var events = {};
 		this.addSubscriber = function(attrName, subscriptionFn){
-			events[attrName] =subscriptionFn;
+			events[attrName] = events[attrName] || []
+			events[attrName].push(subscriptionFn);
+		}
+		function triggerEvents(attrName){
+			var subscriptionFns = events[attrName] || [];
+			subscriptionFns.forEach(function(fn){
+				fn();
+			});
 		}
 	}
 	SalaryCalculator.prototype.calculate = function(){
