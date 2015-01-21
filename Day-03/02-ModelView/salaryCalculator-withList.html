@@ -106,13 +106,37 @@
 	}
 	//View
 
-	
+	function SalaryCalculatorListView(calculator){
+		var $root = this.$root = $("<table><tr><th>Basic</th><th>HRA</th><th>DA</th><th>Tax</th><th>Salary</th><th></th></tr></table>");
+		this.initialize = function(){
+			calculator.addSubscriber("salary", function(){
+				var html = [];
+				html.push("<tr>");
+				html.push("<td>" + calculator.get('basic') + "</td>");
+				html.push("<td>" + calculator.get('hra') + "</td>");
+				html.push("<td>" + calculator.get('da') + "</td>");
+				html.push("<td>" + calculator.get('tax') + "</td>");
+				html.push("<td>" + calculator.get('salary') + "</td>");
+				html.push("<td><input type='button' class='remove' value='Remove'></input></td>");
+				html.push("</tr>");
+				$root.append(html.join(''));
+			});
+		
+			$root.on("click", ".remove", function(){
+				var $this = $(this);
+				$this.parents("tr").remove();
+			});
+		};
+	}
 	
 	$(function(){
 		var calculator = new SalaryCalculator();
 		var view = new SalaryCalculatorView(calculator);
 		view.initialize();
 		view.render().$root.appendTo(document.body);
+		var listView = new SalaryCalculatorListView(calculator);
+		listView.initialize();
+		listView.$root.appendTo(document.body);
 	});
 	</script>
 	<script type="text/template" id="calculatorTemplate" >
