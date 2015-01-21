@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Task Manager</title>
+	<style type="text/css">
+		.completed {
+			color : red;
+			text-decoration: line-through;
+			font-style: italic;
+			font-weight: bold;
+		}
+		li{
+			cursor: pointer;
+		}
+	</style>
+	<script src="jquery-2.1.3.js"></script>
+	<script>
+	$(function(){
+		$("#btnAddTask").click(onBtnAddTaskClick);
+		$("#btnRemoveCompleted").click(onBtnRemoveCompletedClick)
+		$("li").click(onTaskItemClick);
+		loadTasksFromStorage();
+	})
+	function loadTasksFromStorage(){
+		var result = [];
+		for(var i=0;i<window.localStorage.length;i++){
+			var key = window.localStorage.key(i);
+			var taskAsString = window.localStorage.getItem(key);
+			var task = window.JSON.parse(taskAsString);
+			result.push(task);
+		}
+		addTasksToList(result);	
+	}
+	function addTasksToList(tasks){
+		for(var i=0;i<tasks.length;i++)
+			addTaskToList(tasks[i]);
+	}
+	function onBtnRemoveCompletedClick(){
+		$("#olTaskList > li.completed").each(function(index, elem){
+			var $elem = $(elem);
+			var taskId = $elem.attr("taskId");
+			window.localStorage.removeItem(taskId);
+			$elem.remove();
+		});
+		displayMessage("Zero or more completed tasks are removed");
+	}
+	function onTaskItemClick(){
+		$(this).toggleClass("completed");
+		toggleTaskInStorage($(this).attr("taskId"));
+	}
+	function toggleTaskInStorage(taskId){
+		var task = JSON.parse(window.localStorage.getItem(taskId));
+		task.isCompleted = !task.isCompleted;
+		window.localStorage.setItem(taskId, JSON.stringify(task));
+	}
+	function onBtnAddTaskClick(){
+		var taskId = new Date().valueOf().toString();
+		var taskName = $("#txtTask").val();
+		var newTask = {
+			id : taskId,
+			name : taskName,
+			isCompleted : false
+		};
+		window.localStorage.setItem(taskId, JSON.stringify(newTask));
+		addTaskToList(newTask);
+	}
+	function addTaskToList(task){
+		$("<li></li>")
+			.attr("taskId", task.id)
+			.appendTo("#olTaskList")
+			.click(onTaskItemClick)
+			.addClass(task.isCompleted ? "completed" : "")
+			.html(task.name);
+		displayMessage("A new task is added");
+	}
+	function displayMessage(msg){
+		$("#divMessage").html(msg);
+	}
+	/*
+	window.localStorage
+		key/value store
+		key and value should be string
+
+		- length
+		- setItem(k,v)
+		- getItem(k) => v
+		- removeItem(k)
+		- clear()
+		- key(index) => k
+
+	*/
+	</script>
+</head>
+<body>
+	<h1>Task Manager</h1>
+	<hr>
+	<label for="">Task :</label>
+	<input type="text" name="" id="txtTask">
+	<input type="button" value="Add Task" id="btnAddTask">
+	<input type="button" value="Remove Completed" id="btnRemoveCompleted">
+	<ol id="olTaskList">
+		
+	</ol>
+	<div id="divMessage"></div>
+</body>
+</html>
