@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Angular Demo</title>
+	<script src="angular.js"></script>
+	<script>
+	function greetController($scope){
+		$scope.empName = "";
+		$scope.greetMsg = "";
+		$scope.greet = function(){
+			$scope.greetMsg = "Hi " + $scope.empName + ", Have a nice day!";
+		}
+	}
+	</script>
+</head>
+<body ng-app data-ng-controller="greetController">
+	<label>Name :</label>
+	<input type="text" ng-model="empName">
+	<input type="button" value="Greet" ng-click="greet()">
+	<div>{{greetMsg | uppercase}}</div>
+</body>
+</html>

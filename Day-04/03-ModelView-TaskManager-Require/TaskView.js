@@ -3,9 +3,9 @@ define(['jquery'], function($){
 		var $root = this.$root = $("<li></li>");
 		var self = this;
 		this.initialize = function(){
-			task.addSubscriber("all", function(){
-				self.render();
-			});
+			task.addSubscriber("all", (function(){
+				this.render();
+			}).bind(this));
 
 			task.addSubscriber("removed", function(){
 				$root.remove();

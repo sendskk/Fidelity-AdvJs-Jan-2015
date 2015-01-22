@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Task Manager</title>
+	<style>
+	.completed {
+		color : red;
+		text-decoration: line-through;
+		font-style: italic;
+		font-weight: bold;
+	}
+	.invalid{
+		border : 2px solid red;
+	}
+	</style>
+	<script src="angular.js"></script>
+	<script>
+		angular.module('taskApp', []);
+		angular.module("taskApp").factory('Task', function(){
+			function Task(name, isCompleted){
+				this.name = name || "";
+				this.isCompleted = isCompleted || false;
+			}
+			Task.prototype.toggle = function(){
+				this.isCompleted = !this.isCompleted;
+			}
+			return Task;
+		});
+		angular.module("taskApp").filter("trimText", function(){
+			return function(taskName){
+				taskName = taskName || "";
+				return taskName.length > 10 ? taskName.substr(0,10) + "..." : taskName
+			}
+		});
+		angular.module("taskApp").controller("taskController", function($scope, Task){
+			$scope.tasks = [];
+			$scope.addTask = function(taskName){
+				var newTask = new Task(taskName)
+				$scope.tasks.push(newTask);
+			};
+			$scope.toggle = function(task){
+				task.toggle();
+			};
+			$scope.removeCompleted = function(){
+				$scope.tasks = $scope.tasks.filter(function(task){ return !task.isCompleted});
+			}
+		});
+	
+	</script>
+</head>
+<body ng-app="taskApp">
+	<h1>Task Manager</h1>
+	<hr>
+	<div data-ng-controller="taskController">
+		<div>
+			Number of tasks = {{tasks.length}}
+		</div>
+		<form action="" name="taskForm">
+		<label for="">Task :</label>
+			<input type="text" ng-model="newTask" minlength="10" data-ng-class="{invalid : taskForm.$invalid}">
+
+			<input type="button" value="Add Task" data-ng-click="addTask(newTask)">
+			<input type="button" value="Remove Completed" data-ng-click="removeCompleted()">
+			<div>{{taskForm}}</div>
+		</form>
+		<ol>
+			<li 
+				data-ng-class="{completed : task.isCompleted}" 
+				data-ng-repeat="task in tasks"
+				data-ng-click="toggle(task)"
+				>{{task.name | trimText}}</li>
+		</ol>
+	</div>
+</body>
+</html>
