@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Task Manager</title>
+	<style type="text/css">
+		.completed {
+			color : red;
+			text-decoration: line-through;
+			font-style: italic;
+			font-weight: bold;
+		}
+	</style>
+	<script src="jquery-2.1.3.js"></script>
+	<script>
+	function Task(defaults){
+		var data = defaults || {
+			id : -1,
+			name : "",
+			isCompleted : false
+		};
+		this.toggle = function(){
+			this.set("isCompleted", !this.get("isCompleted"))
+		}
+		this.get = function(attrName){
+			return data[attrName];
+		};
+		this.set = function(attrName, value){
+			data[attrName] = value;
+			triggerEvents(attrName);
+			triggerEvents('all');
+		};
+		this.destroy = function(){
+			triggerEvents("removed");
+		};
+		this.toJSON = function(){
+			return {
+				id : data.id,
+				name : data.name,
+				isCompleted : data.isCompleted
+			};
+		};
+
+		var events = {};
+		this.addSubscriber = function(attrName, subscriptionFn){
+			events[attrName] = events[attrName] || []
+			events[attrName].push(subscriptionFn);
+		}
+		function triggerEvents(attrName){
+			var subscriptionFns = events[attrName] || [];
+			subscriptionFns.forEach(function(fn){
+				fn();
+			});
+		}
+
+	}
+
+	function TaskView(task){
+		var $root = this.$root = $("<li></li>");
+		var self = this;
+		this.initialize = function(){
+			task.addSubscriber("all", function(){
+				self.render();
+			});
+
+			task.addSubscriber("removed", function(){
+				$root.remove();
+			})
+
+			$root.click(function(){
+				task.toggle();
+			});
+		};
+		this.render = function(){
+			$root.html(task.get("name"))
+			if (task.get("isCompleted")){
+				$root.addClass("completed");
+			} else {
+				$root.removeClass("completed");
+			}
+			return this;
+		}
+	}
+
+	function TaskCollection(){
+		var data = [];
+
+		this.add = function(taskName){
+			var	taskId = new Date().valueOf().toString();
+			var newTask = new Task({
+				id : taskId,
+				name : taskName,
+				isCompleted : false
+			});
+			data.push(newTask);
+			triggerEvents("add", newTask)
+		}
+		this.get = function(index){
+			return data[index];
+		};
+		
+		this.toJSON = function(){
+			return data;
+		};
+
+		this.removeCompleted = function(){
+			for(var i=data.length-1; i>=0;i--){
+				var task = data[i];
+				if (task.get("isCompleted")){
+					task.destroy();
+					data.splice(i,1);
+				}
+			}
+		}
+
+		var events = {};
+		this.addSubscriber = function(evtName, subscriptionFn){
+			events[evtName] = events[evtName] || []
+			events[evtName].push(subscriptionFn);
+		}
+		var self = this;
+		function triggerEvents(evtName){
+			var args = Array.prototype.slice.call(arguments,1);
+			var subscriptionFns = events[evtName] || [];
+			subscriptionFns.forEach(function(fn){
+				fn.apply(self, args);
+			});
+		}
+	}
+
+	function TaskCollectionView(taskCollection){
+		var $root = this.$root = $("<div></div>");
+		this.init = function(){
+			$root.on("click", "#btnAddTask", function(){
+				var taskName = $("#txtTask", $root).val();
+				taskCollection.add(taskName);
+			});
+
+			$root.on("click", "#btnRemoveCompleted", function(){
+				taskCollection.removeCompleted();
+			});
+
+			taskCollection.addSubscriber("add", function(task){
+				var newTaskView = new TaskView(task);
+				newTaskView.initialize();
+				newTaskView.render();
+				newTaskView.$root.appendTo($root.find("#olTaskList"));
+			});
+		};
+		var self = this;
+		this.render = function(){
+			var templateHTML =$("#taskCollectionTemplate").html();
+			$root.html(templateHTML);
+			return this;
+		}
+	}
+
+	$(function(){
+		window.taskCollection = new TaskCollection();
+		window.taskCollectionView = new TaskCollectionView(taskCollection);
+		taskCollectionView.init();
+		taskCollectionView.render().$root.appendTo(document.body);
+	});
+	</script>
+	<script type="text/template" id="taskCollectionTemplate">
+			<label for="">Task :</label>
+			<input type="text" name="" id="txtTask">
+			<input type="button" value="Add Task" id="btnAddTask">
+			<input type="button" value="Remove Completed" id="btnRemoveCompleted">
+			<ol id="olTaskList"></ol>
+	</script>
+</head>
+<body>
+	<h1>Task Manager</h1>
+	<hr>
+	
+</body>
+</html>
